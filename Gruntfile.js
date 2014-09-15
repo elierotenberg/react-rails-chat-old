@@ -34,7 +34,8 @@ var Gruntfile = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: "src",
-                    src: ["**/*.jsx"],
+                    src: ["*.jsx"],
+                    dest: "src/",
                     ext: ".js",
                 }],
             },

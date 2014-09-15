@@ -443,3 +443,8 @@
 }).apply(this, Function("return [this, function GeneratorFunction(){}]")());
 
 var R = require("react-rails");
+var appParams = require("./appParams");
+
+var client = new R.Client(appParams);
+client.mount();
+

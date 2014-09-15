@@ -11,14 +11,14 @@ var ChatFlux = R.Flux.createFlux({
     },
     bootstrapInClient: function bootstrapInClient(window, headers, guid) {
         return function(fn) {
-            var uplink = new R.Uplink("http://localhost:45743/http/", "http://localhost:45743/socket/", guid);
+            var uplink = new R.Uplink("http://localhost:45743/uplink/", "http://localhost:45743/uplink/", guid);
             this.bootstrap(uplink);
             fn();
         };
     },
     bootstrapInServer: function bootstrapInServer(req, headers, guid) {
         return function(fn) {
-            var uplink = new R.Uplink("http://localhost:45743/http/", null, guid);
+            var uplink = new R.Uplink("http://localhost:45743/uplink/", null, guid);
             this.bootstrap(uplink);
             fn();
         };

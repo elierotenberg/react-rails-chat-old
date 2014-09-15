@@ -8,7 +8,7 @@ var RouteHandler = function RouteHandler(title, description, name) {
     this.name = name;
 };
 
-router.register("/", new RouteHandler("React on Rails Chat", "Web Chat built with React on Rails", "home"));
-router.register("/about", new RouteHandler("React on Rails Chat - About", "About React on Rails", "about"));
+router.router("/", new RouteHandler("React on Rails Chat", "Web Chat built with React on Rails", "home"));
+router.router("/about", new RouteHandler("React on Rails Chat - About", "About React on Rails", "about"));
 
 module.exports = router;

@@ -1,4 +1,6 @@
 var R = require("react-rails");
+var _ = require("lodash");
+var assert = require("assert");
 
 var ChatDispatcher = function ChatDispatcher(flux, uplink) {
     R.Dispatcher.call(this);
@@ -36,6 +38,9 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
     },
     _sendPoke: function _sendPoke(params) {
         this._uplink.dispatch("sendPoke", params);
+    },
+    _setTopic: function _setTopic(params) {
+        this._uplink.dispatch("setTopic", params);
     },
 });
 

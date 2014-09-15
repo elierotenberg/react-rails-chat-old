@@ -4,7 +4,7 @@
   "description": "Web Chat built with React on Rails",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --harmony src/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,16 @@
   },
   "homepage": "https://github.com/elierotenberg/react-rails-chat",
   "dependencies": {
+    "co": "^3.1.0",
     "envify": "^3.0.0",
+    "express": "^4.9.0",
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.0.1",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "^0.5.1",
     "grunt-react": "^0.9.0",
-    "grunt-regenerator": "^1.1.0"
+    "grunt-regenerator": "^1.1.0",
+    "lodash": "^2.4.1",
+    "react": "^0.11.1"
   }
 }

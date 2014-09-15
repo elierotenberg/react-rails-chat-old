@@ -37,6 +37,9 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
     _sendPoke: function _sendPoke(params) {
         this._uplink.dispatch("sendPoke", params);
     },
+    _setTopic: function _setTopic(params) {
+        this._uplink.dispatch("setTopic", params);
+    },
 });
 
 module.exports = ChatDispatcher;
