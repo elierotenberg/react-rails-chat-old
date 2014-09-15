@@ -1,0 +1,24 @@
+{
+  "name": "react-rails-chat",
+  "version": "0.0.0",
+  "description": "Web Chat built with React on Rails",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:elierotenberg/react-rails-chat.git"
+  },
+  "keywords": [
+    "chat",
+    "react",
+    "react-rails"
+  ],
+  "author": "Elie Rotenberg <elie@rotenberg.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elierotenberg/react-rails-chat/issues"
+  },
+  "homepage": "https://github.com/elierotenberg/react-rails-chat"
+}
