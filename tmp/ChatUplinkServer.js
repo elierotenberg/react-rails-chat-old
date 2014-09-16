@@ -1,4 +1,6 @@
 var R = require("react-rails");
+var _ = require("lodash");
+var assert = require("assert");
 var co = require("co");
 
 var lastMessagesMaxLength = 30;

@@ -1,4 +1,6 @@
 var R = require("react-rails");
+var _ = require("lodash");
+var assert = require("assert");
 
 var ChatDispatcher = function ChatDispatcher(flux, uplink) {
     R.Dispatcher.call(this);
