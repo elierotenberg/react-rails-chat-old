@@ -5,9 +5,13 @@ var assert = require("assert");
 var router = new R.Router();
 
 var RouteHandler = function RouteHandler(title, description, name) {
-    this.title = title;
-    this.description = description;
-    this.name = name;
+    return function RouteHandlerInstance() {
+        return {
+            title: title,
+            description: description,
+            name: name,
+        };
+    };
 };
 
 router.route("/", new RouteHandler("React on Rails Chat", "Web Chat built with React on Rails", "home"));

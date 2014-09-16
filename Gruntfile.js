@@ -1,6 +1,11 @@
 var Gruntfile = function(grunt) {
     grunt.initConfig({
         jshint: {
+            options: {
+                globals: {
+                    Promise: true,
+                },
+            },
             files: ["*.js", "src/**/*.js"],
         },
         regenerator: {
@@ -65,16 +70,15 @@ var Gruntfile = function(grunt) {
             },
         },
         clean: {
-            default: {
-                tmp: ["tmp"],
-            },
+            tmp: ["tmp"],
         },
         copy: {
             tmpToDist: {
                 files: [{
                     expand: true,
-                    src: ["tmp/**"],
-                    dest: ["dist/"],
+                    cwd: "src",
+                    src: ["**"],
+                    dest: "dist/",
                 }],
             },
         },
@@ -86,8 +90,8 @@ var Gruntfile = function(grunt) {
     grunt.loadNpmTasks("grunt-browserify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.registerTask("default", ["react", "jshint", "regenerator", "tmpToDist", "browserify", "uglify", "clean:tmp"]);
-    grunt.registerTask("server", ["react", "jshint", "regenerator", "tmpToDist", "clean:tmp"]);
+    grunt.registerTask("default", ["react", "jshint", "regenerator", "copy:tmpToDist", "browserify", "uglify", "clean:tmp"]);
+    grunt.registerTask("server", ["react", "jshint", "regenerator", "copy:tmpToDist", "clean:tmp"]);
 };
 
 module.exports = Gruntfile;
