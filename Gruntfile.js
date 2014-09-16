@@ -64,13 +64,30 @@ var Gruntfile = function(grunt) {
                 },
             },
         },
+        clean: {
+            default: {
+                tmp: ["tmp"],
+            },
+        },
+        copy: {
+            tmpToDist: {
+                files: [{
+                    expand: true,
+                    src: ["tmp/**"],
+                    dest: ["dist/"],
+                }],
+            },
+        },
     });
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-react");
     grunt.loadNpmTasks("grunt-regenerator");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-browserify");
-    grunt.registerTask("default", ["react", "jshint", "regenerator", "browserify", "uglify"]);
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.registerTask("default", ["react", "jshint", "regenerator", "tmpToDist", "browserify", "uglify", "clean:tmp"]);
+    grunt.registerTask("server", ["react", "jshint", "regenerator", "tmpToDist", "clean:tmp"]);
 };
 
 module.exports = Gruntfile;
