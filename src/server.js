@@ -8,7 +8,7 @@ var path = require("path");
 
 var app = express();
 
-app.use("/static", express.staticpath.join(__dirname, "..", "dist", "public"));
+app.use("/static", express.static(path.join(__dirname, "..", "dist", "public")));
 
 app.get("/favicon.ico", function(req, res) {
     res.status(200).send(null);

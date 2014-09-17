@@ -14,7 +14,7 @@ var appParams = {
     },
     vars: {
         stylesheets: ["/static/normalize.css"],
-        scripts: ["/socket.io/socket.io.js", "/static/client.js"],
+        scripts: ["/static/client.js"],
     },
 };
 

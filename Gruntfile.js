@@ -51,9 +51,9 @@ var Gruntfile = function(grunt) {
         browserify: {
             default: {
                 options: {
-                    transform: ["brfs"],
                     browserifyOptions: {
                         debug: true,
+                        deps: true,
                     },
                 },
                 files: {
