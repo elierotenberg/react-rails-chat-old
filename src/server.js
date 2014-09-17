@@ -8,13 +8,7 @@ var path = require("path");
 
 var app = express();
 
-app.get("/client.js", function(req, res) {
-    res.sendFile(path.join(__dirname, "..", "dist", "client.js"));
-});
-
-app.get("/client.min.js", function(req, res) {
-    res.sendFile(path.join(__dirname, "...", "dist", "client.min.js"));
-});
+app.use("/static", express.staticpath.join(__dirname, "..", "dist", "public"));
 
 app.get("/favicon.ico", function(req, res) {
     res.status(200).send(null);

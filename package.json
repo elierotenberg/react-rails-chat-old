@@ -4,7 +4,7 @@
   "description": "Web Chat built with React on Rails",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js"
+    "start": "node dist-server/server.js"
   },
   "repository": {
     "type": "git",
@@ -35,6 +35,7 @@
     "grunt-react": "^0.9.0",
     "grunt-regenerator": "^1.1.0",
     "lodash": "^2.4.1",
+    "normalize.css": "^3.0.1",
     "react": "^0.11.1"
   }
 }

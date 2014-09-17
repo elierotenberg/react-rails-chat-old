@@ -12,7 +12,10 @@ var appParams = {
             lang: R.Localize.extractLocale(req.headers, ["en-US", "fr-FR"]),
         }, router.match(req.path)));
     },
-    client: "/client.js",
+    vars: {
+        stylesheets: ["/static/normalize.css"],
+        scripts: ["/socket.io/socket.io.js", "/static/client.js"],
+    },
 };
 
 module.exports = appParams;

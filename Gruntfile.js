@@ -16,6 +16,9 @@ var Gruntfile = function(grunt) {
                     src: ["*.js"],
                     dest: "tmp/",
                 }],
+                options: {
+                    includeRuntime: false,
+                },
             },
             client: {
                 files: {
@@ -48,12 +51,13 @@ var Gruntfile = function(grunt) {
         browserify: {
             default: {
                 options: {
+                    transform: ["brfs"],
                     browserifyOptions: {
                         debug: true,
                     },
                 },
                 files: {
-                    "dist/client.js": "tmp/client.js",
+                    "dist/public/client.js": "tmp/client.js",
                 },
             },
         },
@@ -65,21 +69,27 @@ var Gruntfile = function(grunt) {
                     sourceMap: false,
                 },
                 files: {
-                    "dist/client.min.js": "dist/client.js",
+                    "dist/public/client.min.js": "dist/public/client.js",
                 },
             },
         },
         clean: {
+            dist: ["dist"],
             tmp: ["tmp"],
         },
         copy: {
-            tmpToDist: {
+            tmpToDistServer: {
                 files: [{
                     expand: true,
-                    cwd: "src",
-                    src: ["**"],
+                    cwd: "tmp",
+                    src: ["**", "!client.js"],
                     dest: "dist/",
                 }],
+            },
+            normalizeToPublic: {
+                files: {
+                    "dist/public/normalize.css": "node_modules/normalize.css/normalize.css",
+                },
             },
         },
     });
@@ -90,8 +100,14 @@ var Gruntfile = function(grunt) {
     grunt.loadNpmTasks("grunt-browserify");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.registerTask("default", ["react", "jshint", "regenerator", "copy:tmpToDist", "browserify", "uglify", "clean:tmp"]);
-    grunt.registerTask("server", ["react", "jshint", "regenerator", "copy:tmpToDist", "clean:tmp"]);
+    grunt.registerTask("begin", ["clean", "react", "jshint", "regenerator"]);
+    grunt.registerTask("end", ["clean:tmp"]);
+    grunt.registerTask("make-client", ["browserify", "copy:normalizeToPublic"]);
+    grunt.registerTask("make-server", ["copy:tmpToDistServer"]);
+    grunt.registerTask("min-client", ["uglify"]);
+    grunt.registerTask("default", ["begin", "make-client", "make-server", "end"]);
+    grunt.registerTask("client", ["begin", "make-client", "end"]);
+    grunt.registerTask("server", ["begin", "make-server", "end"]);
 };
 
 module.exports = Gruntfile;
