@@ -5,6 +5,21 @@ var co = require("co");
 
 var lastMessagesMaxLength = 30;
 
+var createAction = function createAction(syncHandler) {
+    return function action(params) {
+        return R.scope(function(fn) {
+            var res;
+            try {
+                res = syncHandler.call(this, params);
+            }
+            catch(err) {
+                return fn(err);
+            }
+            return fn(null, res);
+        }, this);
+    };
+};
+
 var ChatUplinkServer = R.SimpleUplinkServer.createServer({
     bootstrap: function bootstrap() {
         this.setStore("/users", {});
@@ -35,7 +50,7 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         "/pokes",
     ],
     actions: {
-        "/sendMessage": function sendMessage(params) {
+        "/sendMessage": createAction(function sendMessage(params) {
             assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
             var timestamp = Date.now();
             var message = {
@@ -49,13 +64,13 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
                 lastmessages.shift();
             }
             this.setStore("/lastmessages", lastmessages);
-        },
-        "/setNickname": function setNickname(params) {
+        }),
+        "/setNickname": createAction(function setNickname(params) {
             assert(_.has(params.nickname) && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
             var publicId = R.hash(params.guid);
             this.setStore("/users/" + publicId, params.nickname);
-        },
-        "/sendEmote": function sendEmote(params) {
+        }),
+        "/sendEmote": createAction(function sendEmote(params) {
             assert(_.has(params.emote) && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
             var timestamp = Date.now();
             this.emitEvent("/emotes", {
@@ -63,21 +78,23 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
                 emote: params.emote,
                 timestamp: timestamp,
             });
-        },
-        "/sendPoke": function sendPoke(params) {
-            assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
-            if(this.getStore("/users/" + params.to) === void 0) {
-                throw new Error("sendPoke(...): no such target.");
-            }
-            this.emitEvent("/pokes", {
-                from: R.hash(params.guid),
-                to: params.to,
+        }),
+        "/sendPoke": createAction(function sendPoke(params) {
+            return R.scope(function(fn) {
+                assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
+                if(this.getStore("/users/" + params.to) === void 0) {
+                    throw new Error("sendPoke(...): no such target.");
+                }
+                this.emitEvent("/pokes", {
+                    from: R.hash(params.guid),
+                    to: params.to,
+                });
             });
-        },
-        "/setTopic": function setTopic(params) {
+        }),
+        "/setTopic": createAction(function setTopic(params) {
             assert(_.has(params.topic) && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
             this.setStore("/topic", params.topic);
-        },
+        }),
     },
 });
 

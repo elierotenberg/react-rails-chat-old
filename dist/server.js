@@ -444,24 +444,26 @@
 
 var R = require("react-rails");
 var express = require("express");
+var cors = require("cors");
 var _ = require("lodash");
 var assert = require("assert");
 var appParams = require("./appParams");
 var ChatUplinkServer = require("./ChatUplinkServer");
 var path = require("path");
 
-var app = express();
+var renderApp = express();
+renderApp.use(cors());
 
-app.use("/static", express.static(path.join(__dirname, "..", "dist", "public")));
-
-app.get("/favicon.ico", function(req, res) {
+renderApp.use("/static", express.static(path.join(__dirname, "..", "dist", "public")));
+renderApp.get("/favicon.ico", function(req, res) {
     res.status(200).send(null);
 });
 
-var railsServer = new R.Server(appParams);
+var renderServer = new R.Server(appParams);
+renderApp.use(renderServer.middleware).listen(45743);
+
+var uplinkApp = express();
+renderApp.use(cors());
+
 var uplinkServer = new ChatUplinkServer();
-
-app.use(railsServer.middleware);
-uplinkServer.installHandlers(app, "/uplink/");
-
-app.listen(45743);
+uplinkServer.installHandlers(uplinkApp, "/uplink/").listen(45744);

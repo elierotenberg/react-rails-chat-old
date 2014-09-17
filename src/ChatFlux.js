@@ -12,7 +12,7 @@ var ChatFlux = R.Flux.createFlux({
         this.registerStore("uplink", new UplinkStore());
     },
     bootstrapInClient: function bootstrapInClient(window, headers, guid) {
-        var uplink = new R.Uplink("http://localhost:45743/uplink/", "http://localhost:45743/uplink/", guid);
+        var uplink = new R.Uplink("http://localhost:4574/uplink/", "http://localhost:45744/uplink/", guid);
         this.bootstrap(uplink);
         var MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
         var UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
@@ -22,7 +22,7 @@ var ChatFlux = R.Flux.createFlux({
         return Promise.cast(void 0);
     },
     bootstrapInServer: function bootstrapInServer(req, headers, guid) {
-        var uplink = new R.Uplink("http://localhost:45743/uplink/", null, guid);
+        var uplink = new R.Uplink("http://localhost:45744/uplink/", null, guid);
         this.bootstrap(uplink);
         return Promise.cast(void 0);
     },
