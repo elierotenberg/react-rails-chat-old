@@ -7,12 +7,7 @@ var assert = require("assert");
 module.exports = R.Root.createClass({
     displayName: "ChatRoot",
     render: function render() {
-        console.warn("rendering");
-        R.Debug.display("context", this.context);
-        R.Debug.display("props", this.props);
-        R.Debug.display("state", this.state);
         var r = <div className="ChatRoot">ChatRoot</div>;
-        R.Debug.display("r", r);
         return null;
     },
 });

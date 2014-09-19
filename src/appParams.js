@@ -7,10 +7,11 @@ var appParams = {
     fluxClass: require("./ChatFlux"),
     rootClass: require("./ChatRoot"),
     componentsClasses: require("./componentsClasses"),
-    bootstrapTemplateVarsInServer: function bootstrapTemplateVarsInServer(req) {
-        return Promise.cast(_.extend({
+    bootstrapTemplateVarsInServer: function* bootstrapTemplateVarsInServer(req) {
+        yield R.noopThunk();
+        return _.extend({
             lang: R.Localize.extractLocale(req.headers, ["en-US", "fr-FR"]),
-        }, router.match(req.path)));
+        }, router.match(req.path));
     },
     vars: {
         stylesheets: ["/static/normalize.css"],

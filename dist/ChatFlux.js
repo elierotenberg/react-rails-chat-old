@@ -26,15 +26,18 @@ var ChatFlux = R.Flux.createFlux({
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 uplink = new R.Uplink("http://localhost:4574/uplink/", "http://localhost:45744/uplink/", guid);
-                context$1$0.next = 3;
+                R.Debug.dev(R.scope(function() {
+                    this._uplink = uplink;
+                }, this));
+                context$1$0.next = 4;
                 return this.bootstrap(uplink);
-            case 3:
+            case 4:
                 MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
                 UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
                 this.registerEventEmitter("memory", new MemoryEventEmitter());
                 this.registerEventEmitter("uplink", new UplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom));
                 this.registerDispatcher("dispatcher", new ChatDispatcher(this, uplink));
-            case 8:
+            case 9:
             case "end":
                 return context$1$0.stop();
             }

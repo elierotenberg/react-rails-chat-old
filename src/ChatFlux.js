@@ -21,6 +21,9 @@ var ChatFlux = R.Flux.createFlux({
     },
     bootstrapInClient: function* bootstrapInClient(window, headers, guid) {
         var uplink = new R.Uplink("http://localhost:4574/uplink/", "http://localhost:45744/uplink/", guid);
+        R.Debug.dev(R.scope(function() {
+            this._uplink = uplink;
+        }, this));
         yield this.bootstrap(uplink);
         var MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
         var UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
