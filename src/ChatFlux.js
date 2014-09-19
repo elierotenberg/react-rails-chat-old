@@ -14,7 +14,7 @@ var ChatFlux = R.Flux.createFlux({
                 this.registerStore("uplink", new UplinkStore());
             }
             catch(err) {
-                return fn(R.Debug.extendError("ChatFlux.bootstrpa(...)"));
+                return fn(R.Debug.extendError("ChatFlux.bootstrap(...)"));
             }
             return fn(null);
         }, this);

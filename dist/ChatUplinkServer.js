@@ -24,21 +24,20 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         return regeneratorRuntime.wrap(function sessionCreated$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                console.warn("sessionCreated", guid);
                 publicId = R.hash(guid);
-                context$1$0.next = 4;
+                context$1$0.next = 3;
                 return this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
-            case 4:
-                context$1$0.next = 6;
+            case 3:
+                context$1$0.next = 5;
                 return this.getStore("/users");
-            case 6:
+            case 5:
                 users = context$1$0.sent;
                 users[publicId] = true;
-                context$1$0.next = 10;
+                context$1$0.next = 9;
                 return this.setStore("/users", users);
-            case 10:
+            case 9:
                 return context$1$0.abrupt("return", context$1$0.sent);
-            case 11:
+            case 10:
             case "end":
                 return context$1$0.stop();
             }
@@ -50,18 +49,17 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         return regeneratorRuntime.wrap(function sessionDestroyed$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                console.warn("sessionDestroyed", guid);
                 publicId = R.hash(guid);
-                context$1$0.next = 4;
+                context$1$0.next = 3;
                 return this.getStore("/users");
-            case 4:
+            case 3:
                 users = context$1$0.sent;
                 delete users[publicId];
-                context$1$0.next = 8;
+                context$1$0.next = 7;
                 return this.setStore("/users", users);
-            case 8:
+            case 7:
                 return context$1$0.abrupt("return", context$1$0.sent);
-            case 9:
+            case 8:
             case "end":
                 return context$1$0.stop();
             }
