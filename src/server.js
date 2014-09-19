@@ -19,7 +19,16 @@ var renderServer = new R.Server(appParams);
 renderApp.use(renderServer.middleware).listen(45743);
 
 var uplinkApp = express();
-renderApp.use(cors());
+uplinkApp.use(cors());
+console.log("Render server listening...");
 
 var uplinkServer = new ChatUplinkServer();
-uplinkServer.installHandlers(uplinkApp, "/uplink/").listen(45744);
+uplinkServer.installHandlers(uplinkApp, "/uplink/")(function(err, res) {
+	if(err) {
+		R.Debug.fail(err);
+	}
+	else {
+		res.listen(45744);
+		console.log("Uplink Server listening...");
+	}
+});

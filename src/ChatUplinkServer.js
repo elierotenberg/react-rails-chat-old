@@ -5,7 +5,7 @@ var co = require("co");
 
 var lastMessagesMaxLength = 30;
 
-var createAction = function createAction(syncHandler) {
+var createSyncAction = function createSyncAction(syncHandler) {
     return function action(params) {
         return R.scope(function(fn) {
             var res;
@@ -26,19 +26,23 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         this.setStore("/topic", "Default topic");
     },
     sessionCreated: function sessionCreated(guid) {
-        var publicId = R.hash(guid);
-        this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
-        var users = this.getStore("/users");
-        users[publicId] = true;
-        this.setStore("/users", users);
+        return co(function*() {
+            var publicId = R.hash(guid);
+            this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
+            var users = yield this.getStore("/users");
+            users[publicId] = true;
+            this.setStore("/users", users);            
+        });
     },
     sessionDestroyed: function sessionDestroyed(guid) {
-        var publicId = R.hash(guid);
-        var users = this.getStore("/users");
-        delete users[publicId];
-        this.setStore("/users", users);
+        return co(function*() {
+            var publicId = R.hash(guid);
+            var users = yield this.getStore("/users");
+            delete users[publicId];
+            this.setStore("/users", users);
+        });
     },
-    stores: [
+    store: [
         "/topic",
         "/users",
         "/users/:user",
@@ -50,27 +54,29 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         "/pokes",
     ],
     actions: {
-        "/sendMessage": createAction(function sendMessage(params) {
-            assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
-            var timestamp = Date.now();
-            var message = {
-                message: params.message,
-                timestamp: timestamp,
-            };
-            this.emitEvent("/messages", message);
-            var lastmessages = this.getStore("/lastmessages");
-            lastmessages.push(message);
-            if(lastmessages.length > lastMessagesMaxLength) {
-                lastmessages.shift();
-            }
-            this.setStore("/lastmessages", lastmessages);
+        "/sendMessage": function sendMessage(params) {
+            return R.scope(co(function*() {
+                assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
+                var timestamp = Date.now();
+                var message = {
+                    message: params.message,
+                    timestamp: timestamp,
+                };
+                var lastmessages = yield this.getStore("/lastmessages");
+                lastmessages.push(message);
+                if(lastmessages.length > lastMessagesMaxLength) {
+                    lastmessages.shift();
+                }
+                this.emitEvent("/messages", message);
+                this.setStore("/lastmessages", lastmessages);
+            }), this);
         }),
-        "/setNickname": createAction(function setNickname(params) {
+        "/setNickname": createSyncAction(function setNickname(params) {
             assert(_.has(params.nickname) && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
             var publicId = R.hash(params.guid);
             this.setStore("/users/" + publicId, params.nickname);
         }),
-        "/sendEmote": createAction(function sendEmote(params) {
+        "/sendEmote": createSyncAction(function sendEmote(params) {
             assert(_.has(params.emote) && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
             var timestamp = Date.now();
             this.emitEvent("/emotes", {
@@ -79,19 +85,19 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
                 timestamp: timestamp,
             });
         }),
-        "/sendPoke": createAction(function sendPoke(params) {
-            return R.scope(function(fn) {
+        "/sendPoke": function sendPoke(params) {
+            return R.scope(co(function*() {
                 assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
-                if(this.getStore("/users/" + params.to) === void 0) {
+                if(yield this.getStore("/users/" + params.to) === void 0) {
                     throw new Error("sendPoke(...): no such target.");
                 }
                 this.emitEvent("/pokes", {
                     from: R.hash(params.guid),
                     to: params.to,
                 });
-            });
+            }), this);
         }),
-        "/setTopic": createAction(function setTopic(params) {
+        "/setTopic": createSyncAction(function setTopic(params) {
             assert(_.has(params.topic) && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
             this.setStore("/topic", params.topic);
         }),

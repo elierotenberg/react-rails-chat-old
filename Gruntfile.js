@@ -2,6 +2,7 @@ var Gruntfile = function(grunt) {
     grunt.initConfig({
         jshint: {
             options: {
+                esnext: true,
                 globals: {
                     Promise: true,
                 },
