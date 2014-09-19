@@ -1,13 +1,20 @@
 /** @jsx React.DOM */
 var React = require("react");
 var R = require("react-rails");
-var _ = require("lodash");
-var assert = require("assert");
 
-module.exports = R.Root.createClass({
-    displayName: "ChatRoot",
+var ChatRoot = React.createClass({
+    mixins: [R.Root.Mixin],
+    getFluxStoreSubscriptions: function getFluxStoreSubscriptions() {
+        return {
+            "topic": {
+                storeName: "uplink",
+                storeKey: "/topic",
+            },
+        };
+    },
     render: function render() {
-        var r = <div className="ChatRoot">ChatRoot</div>;
-        return null;
+        return (<div className="ChatRoot">Topic: {this.state.topic}</div>);
     },
 });
+
+module.exports = ChatRoot;

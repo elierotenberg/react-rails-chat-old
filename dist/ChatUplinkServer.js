@@ -24,20 +24,21 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         return regeneratorRuntime.wrap(function sessionCreated$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
+                console.warn("sessionCreated", guid);
                 publicId = R.hash(guid);
-                context$1$0.next = 3;
+                context$1$0.next = 4;
                 return this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
-            case 3:
-                context$1$0.next = 5;
+            case 4:
+                context$1$0.next = 6;
                 return this.getStore("/users");
-            case 5:
+            case 6:
                 users = context$1$0.sent;
                 users[publicId] = true;
-                context$1$0.next = 9;
+                context$1$0.next = 10;
                 return this.setStore("/users", users);
-            case 9:
-                return context$1$0.abrupt("return", context$1$0.sent);
             case 10:
+                return context$1$0.abrupt("return", context$1$0.sent);
+            case 11:
             case "end":
                 return context$1$0.stop();
             }
@@ -49,22 +50,24 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         return regeneratorRuntime.wrap(function sessionDestroyed$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
+                console.warn("sessionDestroyed", guid);
                 publicId = R.hash(guid);
-                context$1$0.next = 3;
+                context$1$0.next = 4;
                 return this.getStore("/users");
-            case 3:
+            case 4:
                 users = context$1$0.sent;
                 delete users[publicId];
-                context$1$0.next = 7;
+                context$1$0.next = 8;
                 return this.setStore("/users", users);
-            case 7:
-                return context$1$0.abrupt("return", context$1$0.sent);
             case 8:
+                return context$1$0.abrupt("return", context$1$0.sent);
+            case 9:
             case "end":
                 return context$1$0.stop();
             }
         }, sessionDestroyed, this);
     }),
+    sessionTimeout: 10000,
     store: [
         "/topic",
         "/users",

@@ -1,4 +1,4 @@
-var R = require("react-rails");
+var R = require("react-rails").install(require("react"), require("react/lib/instantiateReactComponent"));
 var express = require("express");
 var cors = require("cors");
 var _ = require("lodash");

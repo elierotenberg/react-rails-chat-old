@@ -10,6 +10,7 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         yield [this.setStore("/users", {}), this.setStore("/topic", "Default topic")];
     },
     sessionCreated: function* sessionCreated(guid) {
+        console.warn("sessionCreated", guid);
         var publicId = R.hash(guid);
         yield this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
         var users = yield this.getStore("/users");
@@ -17,11 +18,13 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         return yield this.setStore("/users", users);
     },
     sessionDestroyed: function* sessionDestroyed(guid) {
+        console.warn("sessionDestroyed", guid);
         var publicId = R.hash(guid);
         var users = yield this.getStore("/users");
         delete users[publicId];
         return yield this.setStore("/users", users);
     },
+    sessionTimeout: 10000,
     store: [
         "/topic",
         "/users",
