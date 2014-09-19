@@ -6,6 +6,7 @@ var assert = require("assert");
 var appParams = require("./appParams");
 var ChatUplinkServer = require("./ChatUplinkServer");
 var path = require("path");
+var co  = require("co");
 
 var renderApp = express();
 renderApp.use(cors());
@@ -23,12 +24,8 @@ uplinkApp.use(cors());
 console.log("Render server listening...");
 
 var uplinkServer = new ChatUplinkServer();
-uplinkServer.installHandlers(uplinkApp, "/uplink/")(function(err, res) {
-	if(err) {
-		R.Debug.fail(err);
-	}
-	else {
-		res.listen(45744);
-		console.log("Uplink Server listening...");
-	}
-});
+co(function*() {
+    var server = yield uplinkServer.installHandlers(uplinkApp, "/uplink/");
+    server.listen(45744);
+    console.log("Uplink Server listening...");
+})(R.Debug.rethrow("Couldn't start Uplink Server"));

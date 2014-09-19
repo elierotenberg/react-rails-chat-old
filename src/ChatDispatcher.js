@@ -4,7 +4,6 @@ var assert = require("assert");
 
 var ChatDispatcher = function ChatDispatcher(flux, uplink) {
     R.Dispatcher.call(this);
-    _.bindAll(this);
     this._flux = flux;
     this._uplink = uplink;
     _.each(this._actionListeners, this._bindActionListener);
@@ -19,7 +18,7 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
         "sendMessage": "_sendMessage",
     },
     _bindActionListener: function _bindActionListener(method, action) {
-        this.addActionListener(action, this[method]);
+        this.addActionListener(action, R.scope(this[method], this));
     },
     _navigate: function _navigate(params) {
         this._flux.getStore("memory").set("pathname", params.pathname);
