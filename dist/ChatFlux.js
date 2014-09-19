@@ -25,7 +25,7 @@ var ChatFlux = R.Flux.createFlux({
         return regeneratorRuntime.wrap(function bootstrapInClient$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                uplink = new R.Uplink("http://localhost:4574/uplink/", "http://localhost:45744/uplink/", guid);
+                uplink = new R.Uplink("http://localhost:45744/uplink/", "http://localhost:45744/uplink/", guid);
                 R.Debug.dev(R.scope(function() {
                     this._uplink = uplink;
                 }, this));

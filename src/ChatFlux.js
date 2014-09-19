@@ -20,7 +20,7 @@ var ChatFlux = R.Flux.createFlux({
         }, this);
     },
     bootstrapInClient: function* bootstrapInClient(window, headers, guid) {
-        var uplink = new R.Uplink("http://localhost:4574/uplink/", "http://localhost:45744/uplink/", guid);
+        var uplink = new R.Uplink("http://localhost:45744/uplink/", "http://localhost:45744/uplink/", guid);
         R.Debug.dev(R.scope(function() {
             this._uplink = uplink;
         }, this));
