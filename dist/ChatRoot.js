@@ -26,8 +26,8 @@ var ChatRoot = React.createClass({displayName: 'ChatRoot',
     render: function render() {
         return (
             React.DOM.div({className: "ChatRoot"}, 
-                React.DOM.p({className: ".ChatRoot-topic"}, "Topic: ", this.state.topic), 
-                React.DOM.p({className: ".ChatRoot-users"}, "Users: ", _.size(this.state.users))
+                React.DOM.p({className: "ChatRoot-topic"}, "Topic: ", this.state.topic), 
+                React.DOM.p({className: "ChatRoot-users"}, "Users: ", _.size(this.state.users))
             )
         );
     },
