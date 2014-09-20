@@ -15,30 +15,34 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
     _flux: null,
     _uplink: null,
     _actionListeners: {
-        "navigate": "_navigate",
-        "setLocale": "_setLocale",
-        "sendMessage": "_sendMessage",
-        "setNickname": "_setNickname",
-        "sendEmote": "_sendEmote",
-        "sendPoke": "_sendPoke",
-        "setTopic": "_setTopic",
+        "/navigate": "_navigate",
+        "/setLocale": "_setLocale",
+        "/setShouldDisplayTimestamps": "_setShouldDisplayTimestamps",
+        "/sendMessage": "_sendMessage",
+        "/setNickname": "_setNickname",
+        "/sendEmote": "_sendEmote",
+        "/sendPoke": "_sendPoke",
+        "/setTopic": "_setTopic",
     },
     _bindActionListener: function _bindActionListener(method, action) {
         this[method] = R.scope(this[method], this);
         this.addActionListener(action, this[method]);
     },
     _navigate: function _navigate(params) {
-        this._flux.getStore("memory").set("pathname", params.pathname);
+        this._flux.getStore("memory").set("/pathname", params.pathname);
     },
     _setLocale: function _setLocale(params) {
-        this._flux.getStore("memory").set("locale", params.locale);
+        this._flux.getStore("memory").set("/locale", params.locale);
+    },
+    _setShouldDisplayTimestamps: function _setShouldDisplayTimestamps(val) {
+        this._flux.getStore("memory").set("/shouldDisplayTimestamps", val);
     },
     _sendMessage: regeneratorRuntime.mark(function _sendMessage(params) {
         return regeneratorRuntime.wrap(function _sendMessage$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this._uplink.dispatch("sendMessage", params);
+                return this._uplink.dispatch("/sendMessage", params);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:
@@ -52,7 +56,7 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this._uplink.dispatch("setNickname", params);
+                return this._uplink.dispatch("/setNickname", params);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:
@@ -66,7 +70,7 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this._uplink.dispatch("sendEmote", params);
+                return this._uplink.dispatch("/sendEmote", params);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:
@@ -80,7 +84,7 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this._uplink.dispatch("sendPoke", params);
+                return this._uplink.dispatch("/sendPoke", params);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:
@@ -94,7 +98,7 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this._uplink.dispatch("setTopic", params);
+                return this._uplink.dispatch("/setTopic", params);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:

@@ -92,6 +92,16 @@ var Gruntfile = function(grunt) {
                     "dist/public/normalize.css": "node_modules/normalize.css/normalize.css",
                 },
             },
+            bootstrapToPublic: {
+                files: [{
+                    expand: true,
+                    cwd: "node_modules/bootstrap/dist",
+                    src: ["**/*.min.css", "**/*.eot", "**/*.svg", "**/*.ttf", "**/*.woff"],
+                    dest: "dist/public/bootstrap/",
+                }, {
+                    "dist/public/bootstrap/css/bootstrap.min.css": "vendor/bootstrap.min.css",
+                }],
+            },
         },
     });
     grunt.loadNpmTasks("grunt-contrib-jshint");
@@ -103,7 +113,7 @@ var Gruntfile = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.registerTask("begin", ["clean", "react", "jshint", "regenerator"]);
     grunt.registerTask("end", ["clean:tmp"]);
-    grunt.registerTask("make-client", ["browserify", "copy:normalizeToPublic"]);
+    grunt.registerTask("make-client", ["browserify", "copy:bootstrapToPublic"]);
     grunt.registerTask("make-server", ["copy:tmpToDistServer"]);
     grunt.registerTask("min-client", ["uglify"]);
     grunt.registerTask("default", ["begin", "make-client", "make-server", "end"]);

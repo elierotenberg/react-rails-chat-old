@@ -1,9 +1,7 @@
 var R = require("react-rails").install(require("react"), require("react/lib/instantiateReactComponent"));
 var express = require("express");
 var cors = require("cors");
-var _ = require("lodash");
-var assert = require("assert");
-var appParams = require("./appParams");
+var chatAppParams = require("./chatAppParams");
 var ChatUplinkServer = require("./ChatUplinkServer");
 var path = require("path");
 var co  = require("co");
@@ -16,7 +14,7 @@ renderApp.get("/favicon.ico", function(req, res) {
     res.status(200).send(null);
 });
 
-var renderServer = new R.Server(appParams);
+var renderServer = new R.Server(chatAppParams);
 renderApp.use(renderServer.middleware).listen(45743);
 
 var uplinkApp = express();

@@ -1,6 +1,7 @@
 var R = require("react-rails");
 var _ = require("lodash");
 var assert = require("assert");
+var url = require("url");
 var ChatDispatcher = require("./ChatDispatcher");
 var Promise = require("bluebird");
 
@@ -11,6 +12,7 @@ var ChatFlux = R.Flux.createFlux({
                 var MemoryStore = R.Store.createMemoryStore();
                 var UplinkStore = R.Store.createUplinkStore(uplink.fetch, uplink.subscribeTo, uplink.unsubscribeFrom);
                 this.registerStore("memory", new MemoryStore());
+                this.getStore("memory").set("/shouldDisplayTimestamps", true);
                 this.registerStore("uplink", new UplinkStore());
                 this.registerStylesheet("chat", new R.Stylesheet());
             }
@@ -29,16 +31,18 @@ var ChatFlux = R.Flux.createFlux({
             this._uplink = uplink;
         }, this));
         yield this.bootstrap(uplink);
+        this.getStore("memory").set("/pathname", url.parse(window.location.href).pathname);
         yield uplink.ready;
         var MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
         var UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
         this.registerEventEmitter("memory", new MemoryEventEmitter());
         this.registerEventEmitter("uplink", new UplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom));
-        this.registerDispatcher("dispatcher", new ChatDispatcher(this, uplink));
+        this.registerDispatcher("chat", new ChatDispatcher(this, uplink));
     },
     bootstrapInServer: function* bootstrapInServer(req, headers, guid) {
         var uplink = new R.Uplink("http://localhost:45744/uplink/", null, guid);
         yield this.bootstrap(uplink);
+        this.getStore("memory").set("/pathname", url.parse(req.url).pathname);
     },
 });
 

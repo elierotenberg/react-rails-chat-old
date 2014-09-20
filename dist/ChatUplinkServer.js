@@ -3,7 +3,7 @@ var _ = require("lodash");
 var assert = require("assert");
 var co = require("co");
 
-var lastMessagesMaxLength = 30;
+var recentEventsMaxLength = 30;
 
 var ChatUplinkServer = R.SimpleUplinkServer.createServer({
     bootstrap: regeneratorRuntime.mark(function bootstrap() {
@@ -11,7 +11,12 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return [this.setStore("/users", {}), this.setStore("/topic", "Default topic")];
+
+                return [
+                    this.setStore("/users", {}),
+                    this.setStore("/topic", "Default topic"),
+                    this.setStore("/recentEvents", []),
+                ];
             case 2:
             case "end":
                 return context$1$0.stop();
@@ -19,133 +24,180 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
         }, bootstrap, this);
     }),
     sessionCreated: regeneratorRuntime.mark(function sessionCreated(guid) {
-        var publicId, users;
+        var publicId, nickname, users;
 
         return regeneratorRuntime.wrap(function sessionCreated$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 publicId = R.hash(guid);
-                context$1$0.next = 3;
-                return this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
-            case 3:
-                context$1$0.next = 5;
+                nickname = "Anonymous" + _.random(0, 999999);
+                context$1$0.next = 4;
+                return this.setNickname(guid, nickname);
+            case 4:
+                context$1$0.next = 6;
                 return this.getStore("/users");
-            case 5:
+            case 6:
                 users = context$1$0.sent;
                 users[publicId] = true;
-                context$1$0.next = 9;
+                context$1$0.next = 10;
                 return this.setStore("/users", users);
-            case 9:
-                return context$1$0.abrupt("return", context$1$0.sent);
             case 10:
+                context$1$0.next = 12;
+                return this.postEvent("presence", nickname + " has joined.");
+            case 12:
             case "end":
                 return context$1$0.stop();
             }
         }, sessionCreated, this);
     }),
     sessionDestroyed: regeneratorRuntime.mark(function sessionDestroyed(guid) {
-        var publicId, users;
+        var publicId, nickname, users;
 
         return regeneratorRuntime.wrap(function sessionDestroyed$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 publicId = R.hash(guid);
                 context$1$0.next = 3;
-                return this.getStore("/users");
+                return this.getNickname(guid);
             case 3:
+                nickname = context$1$0.sent;
+                context$1$0.next = 6;
+                return this.getStore("/users");
+            case 6:
                 users = context$1$0.sent;
                 delete users[publicId];
-                context$1$0.next = 7;
+                context$1$0.next = 10;
                 return this.setStore("/users", users);
-            case 7:
-                return context$1$0.abrupt("return", context$1$0.sent);
-            case 8:
+            case 10:
+                context$1$0.next = 12;
+                return this.postEvent("presence", nickname + " has left.");
+            case 12:
             case "end":
                 return context$1$0.stop();
             }
         }, sessionDestroyed, this);
     }),
     sessionTimeout: 10000,
+    postEvent: regeneratorRuntime.mark(function postEvent(type, contents) {
+        var recentEvents;
+
+        return regeneratorRuntime.wrap(function postEvent$(context$1$0) {
+            while (1) switch (context$1$0.prev = context$1$0.next) {
+            case 0:
+                context$1$0.next = 2;
+                return this.getStore("/recentEvents");
+            case 2:
+                recentEvents = context$1$0.sent;
+                recentEvents.push({
+                    uniqueId: _.uniqueId("event"),
+                    timestamp: Date.now(),
+                    type: type,
+                    contents: contents,
+                });
+                if(recentEvents.length === recentEventsMaxLength) {
+                    recentEvents.shift();
+                }
+                context$1$0.next = 7;
+                return this.setStore("/recentEvents", recentEvents);
+            case 7:
+                return context$1$0.abrupt("return", context$1$0.sent);
+            case 8:
+            case "end":
+                return context$1$0.stop();
+            }
+        }, postEvent, this);
+    }),
+    getNickname: regeneratorRuntime.mark(function getNickname(guid) {
+        return regeneratorRuntime.wrap(function getNickname$(context$1$0) {
+            while (1) switch (context$1$0.prev = context$1$0.next) {
+            case 0:
+                context$1$0.next = 2;
+                return this.getStore("/users/" + R.hash(guid));
+            case 2:
+                return context$1$0.abrupt("return", context$1$0.sent);
+            case 3:
+            case "end":
+                return context$1$0.stop();
+            }
+        }, getNickname, this);
+    }),
+    setNickname: regeneratorRuntime.mark(function setNickname(guid, nickname) {
+        return regeneratorRuntime.wrap(function setNickname$(context$1$0) {
+            while (1) switch (context$1$0.prev = context$1$0.next) {
+            case 0:
+                context$1$0.next = 2;
+                return this.setStore("/users/" + R.hash(guid), nickname);
+            case 2:
+                return context$1$0.abrupt("return", context$1$0.sent);
+            case 3:
+            case "end":
+                return context$1$0.stop();
+            }
+        }, setNickname, this);
+    }),
     store: [
         "/topic",
         "/users",
         "/users/:user",
-        "/lastmessages",
+        "/recentEvents",
     ],
     events: [
-        "/messages",
-        "/emotes",
-        "/pokes",
     ],
     actions: {
         "/sendMessage": regeneratorRuntime.mark(function sendMessage(params) {
-            var timestamp, message, lastmessages;
+            var from;
 
             return regeneratorRuntime.wrap(function sendMessage$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
                     assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
-                    timestamp = Date.now();
-
-                    message = {
-                        message: params.message,
-                        timestamp: timestamp,
-                    };
-
-                    context$1$0.next = 5;
-                    return this.getStore("/lastmessages");
-                case 5:
-                    lastmessages = context$1$0.sent;
-                    lastmessages.push(message);
-                    if(lastmessages.length > lastMessagesMaxLength) {
-                        lastmessages.shift();
-                    }
-                    this.emitEvent("/messages", message);
-                    context$1$0.next = 11;
-                    return this.setStore("/lastmessages", lastmessages);
-                case 11:
-                    return context$1$0.abrupt("return", context$1$0.sent);
-                case 12:
+                    context$1$0.next = 3;
+                    return this.getNickname(params.guid);
+                case 3:
+                    from = context$1$0.sent;
+                    context$1$0.next = 6;
+                    return this.postEvent("message", from + ": " + params.message);
+                case 6:
                 case "end":
                     return context$1$0.stop();
                 }
             }, sendMessage, this);
         }),
         "/setNickname": regeneratorRuntime.mark(function setNickname(params) {
-            var publicId;
+            var from;
 
             return regeneratorRuntime.wrap(function setNickname$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
                     assert(_.has(params.nickname) && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
-                    publicId = R.hash(params.guid);
-                    context$1$0.next = 4;
-                    return this.setStore("/users/" + publicId, params.nickname);
-                case 4:
-                    return context$1$0.abrupt("return", context$1$0.sent);
-                case 5:
+                    context$1$0.next = 3;
+                    return this.getNickname(params.guid);
+                case 3:
+                    from = context$1$0.sent;
+                    context$1$0.next = 6;
+                    return this.postEvent("nickname", from + " is now known as " + params.nickname + ".");
+                case 6:
+                    context$1$0.next = 8;
+                    return this.setNickname(params.guid, params.nickname);
+                case 8:
                 case "end":
                     return context$1$0.stop();
                 }
             }, setNickname, this);
         }),
         "/sendEmote": regeneratorRuntime.mark(function sendEmote(params) {
-            var timestamp;
+            var from;
 
             return regeneratorRuntime.wrap(function sendEmote$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
                     assert(_.has(params.emote) && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
-                    timestamp = Date.now();
-                    this.emitEvent("/emotes", {
-                        userId: R.hash(params.guid),
-                        emote: params.emote,
-                        timestamp: timestamp,
-                    });
-                    context$1$0.next = 5;
-                    return R.noopThunk();
-                case 5:
-                    return context$1$0.abrupt("return", context$1$0.sent);
+                    context$1$0.next = 3;
+                    return this.getNickname(params.guid);
+                case 3:
+                    from = context$1$0.sent;
+                    context$1$0.next = 6;
+                    return this.postEvent("emote", from + " " + params.emote);
                 case 6:
                 case "end":
                     return context$1$0.stop();
@@ -153,40 +205,53 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             }, sendEmote, this);
         }),
         "/sendPoke": regeneratorRuntime.mark(function sendPoke(params) {
+            var from, to;
+
             return regeneratorRuntime.wrap(function sendPoke$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
                     assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
                     context$1$0.next = 3;
-                    return this.getStore("/users/" + params.to) === void 0;
+                    return this.getNickname(params.guid);
                 case 3:
-                    if (!context$1$0.sent) {
-                        context$1$0.next = 5;
+                    from = context$1$0.sent;
+                    context$1$0.next = 6;
+                    return this.getNickname(params.to);
+                case 6:
+                    to = context$1$0.sent;
+
+                    if (!(to === void 0)) {
+                        context$1$0.next = 9;
                         break;
                     }
 
                     throw new Error("sendPoke(...): no such target.");
-                case 5:
-                    this.emitEvent("/pokes", {
-                        from: R.hash(params.guid),
-                        to: params.to,
-                    });
-                case 6:
+                case 9:
+                    context$1$0.next = 11;
+                    return this.postEvent("poke", from + " pokes " + to);
+                case 11:
                 case "end":
                     return context$1$0.stop();
                 }
             }, sendPoke, this);
         }),
         "/setTopic": regeneratorRuntime.mark(function setTopic(params) {
+            var from;
+
             return regeneratorRuntime.wrap(function setTopic$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
                     assert(_.has(params.topic) && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
                     context$1$0.next = 3;
-                    return this.setStore("/topic", params.topic);
+                    return this.getNickname(params.guid);
                 case 3:
-                    return context$1$0.abrupt("return", context$1$0.sent);
-                case 4:
+                    from = context$1$0.sent;
+                    context$1$0.next = 6;
+                    return this.postEvent("topic", from + " set the topic to " + params.topic);
+                case 6:
+                    context$1$0.next = 8;
+                    return this.setStore("/topic", params.topic);
+                case 8:
                 case "end":
                     return context$1$0.stop();
                 }

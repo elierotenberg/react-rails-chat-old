@@ -3,81 +3,92 @@ var _ = require("lodash");
 var assert = require("assert");
 var co = require("co");
 
-var lastMessagesMaxLength = 30;
+var recentEventsMaxLength = 30;
 
 var ChatUplinkServer = R.SimpleUplinkServer.createServer({
     bootstrap: function* bootstrap() {
-        yield [this.setStore("/users", {}), this.setStore("/topic", "Default topic")];
+        yield [
+            this.setStore("/users", {}),
+            this.setStore("/topic", "Default topic"),
+            this.setStore("/recentEvents", []),
+        ];
     },
     sessionCreated: function* sessionCreated(guid) {
         var publicId = R.hash(guid);
-        yield this.setStore("/users/" + publicId, "User" + _.random(0, 999999));
+        var nickname = "Anonymous" + _.random(0, 999999);
+        yield this.setNickname(guid, nickname);
         var users = yield this.getStore("/users");
         users[publicId] = true;
-        return yield this.setStore("/users", users);
+        yield this.setStore("/users", users);
+        yield this.postEvent("presence", nickname + " has joined.");
     },
     sessionDestroyed: function* sessionDestroyed(guid) {
         var publicId = R.hash(guid);
+        var nickname = yield this.getNickname(guid);
         var users = yield this.getStore("/users");
         delete users[publicId];
-        return yield this.setStore("/users", users);
+        yield this.setStore("/users", users);
+        yield this.postEvent("presence", nickname + " has left.");
     },
     sessionTimeout: 10000,
+    postEvent: function* postEvent(type, contents) {
+        var recentEvents = yield this.getStore("/recentEvents");
+        recentEvents.push({
+            uniqueId: _.uniqueId("event"),
+            timestamp: Date.now(),
+            type: type,
+            contents: contents,
+        });
+        if(recentEvents.length === recentEventsMaxLength) {
+            recentEvents.shift();
+        }
+        return yield this.setStore("/recentEvents", recentEvents);
+    },
+    getNickname: function* getNickname(guid) {
+        return yield this.getStore("/users/" + R.hash(guid));
+    },
+    setNickname: function* setNickname(guid, nickname) {
+        return yield this.setStore("/users/" + R.hash(guid), nickname);
+    },
     store: [
         "/topic",
         "/users",
         "/users/:user",
-        "/lastmessages",
+        "/recentEvents",
     ],
     events: [
-        "/messages",
-        "/emotes",
-        "/pokes",
     ],
     actions: {
         "/sendMessage": function* sendMessage(params) {
             assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
-            var timestamp = Date.now();
-            var message = {
-                message: params.message,
-                timestamp: timestamp,
-            };
-            var lastmessages = yield this.getStore("/lastmessages");
-            lastmessages.push(message);
-            if(lastmessages.length > lastMessagesMaxLength) {
-                lastmessages.shift();
-            }
-            this.emitEvent("/messages", message);
-            return yield this.setStore("/lastmessages", lastmessages);
+            var from = yield this.getNickname(params.guid);
+            yield this.postEvent("message", from + ": " + params.message);
         },
         "/setNickname": function* setNickname(params) {
             assert(_.has(params.nickname) && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
-            var publicId = R.hash(params.guid);
-            return yield this.setStore("/users/" + publicId, params.nickname);
+            var from = yield this.getNickname(params.guid);
+            yield this.postEvent("nickname", from + " is now known as " + params.nickname + ".");
+            yield this.setNickname(params.guid, params.nickname);
         },
         "/sendEmote": function* sendEmote(params) {
             assert(_.has(params.emote) && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
-            var timestamp = Date.now();
-            this.emitEvent("/emotes", {
-                userId: R.hash(params.guid),
-                emote: params.emote,
-                timestamp: timestamp,
-            });
-            return yield R.noopThunk();
+            var from = yield this.getNickname(params.guid);
+            yield this.postEvent("emote", from + " " + params.emote);
         },
         "/sendPoke": function* sendPoke(params) {
             assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
-            if(yield this.getStore("/users/" + params.to) === void 0) {
+            var from = yield this.getNickname(params.guid);
+            var to = yield this.getNickname(params.to);
+            if(to === void 0) {
                 throw new Error("sendPoke(...): no such target.");
             }
-            this.emitEvent("/pokes", {
-                from: R.hash(params.guid),
-                to: params.to,
-            });
+            yield this.postEvent("poke", from + " pokes " + to);
         },
         "/setTopic": function* setTopic(params) {
             assert(_.has(params.topic) && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
-            return yield this.setStore("/topic", params.topic);
+            var from = yield this.getNickname(params.guid);
+            yield this.postEvent("topic", from + " set the topic to " + params.topic);
+            yield this.setStore("/topic", params.topic);
         },
     },
 });
