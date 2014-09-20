@@ -12,9 +12,13 @@ var ChatFlux = R.Flux.createFlux({
                 var UplinkStore = R.Store.createUplinkStore(uplink.fetch, uplink.subscribeTo, uplink.unsubscribeFrom);
                 this.registerStore("memory", new MemoryStore());
                 this.registerStore("uplink", new UplinkStore());
+                this.registerStylesheet("chat", new R.Stylesheet());
             }
             catch(err) {
-                return fn(R.Debug.extendError("ChatFlux.bootstrap(...)"));
+                R.Debug.dev(function() {
+                    throw err;
+                });
+                return fn(R.Debug.extendError(err, "ChatFlux.bootstrap(...)"));
             }
             return fn(null);
         }, this);
@@ -25,6 +29,7 @@ var ChatFlux = R.Flux.createFlux({
             this._uplink = uplink;
         }, this));
         yield this.bootstrap(uplink);
+        yield uplink.ready;
         var MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
         var UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
         this.registerEventEmitter("memory", new MemoryEventEmitter());

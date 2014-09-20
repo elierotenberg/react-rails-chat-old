@@ -12,9 +12,13 @@ var ChatFlux = R.Flux.createFlux({
                 var UplinkStore = R.Store.createUplinkStore(uplink.fetch, uplink.subscribeTo, uplink.unsubscribeFrom);
                 this.registerStore("memory", new MemoryStore());
                 this.registerStore("uplink", new UplinkStore());
+                this.registerStylesheet("chat", new R.Stylesheet());
             }
             catch(err) {
-                return fn(R.Debug.extendError("ChatFlux.bootstrap(...)"));
+                R.Debug.dev(function() {
+                    throw err;
+                });
+                return fn(R.Debug.extendError(err, "ChatFlux.bootstrap(...)"));
             }
             return fn(null);
         }, this);
@@ -32,12 +36,15 @@ var ChatFlux = R.Flux.createFlux({
                 context$1$0.next = 4;
                 return this.bootstrap(uplink);
             case 4:
+                context$1$0.next = 6;
+                return uplink.ready;
+            case 6:
                 MemoryEventEmitter = R.EventEmitter.createMemoryEventEmitter();
                 UplinkEventEmitter = R.EventEmitter.createUplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom);
                 this.registerEventEmitter("memory", new MemoryEventEmitter());
                 this.registerEventEmitter("uplink", new UplinkEventEmitter(uplink.listenTo, uplink.unlistenFrom));
                 this.registerDispatcher("dispatcher", new ChatDispatcher(this, uplink));
-            case 9:
+            case 11:
             case "end":
                 return context$1$0.stop();
             }
