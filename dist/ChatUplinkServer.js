@@ -58,7 +58,7 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             case 0:
                 publicId = R.hash(guid);
                 context$1$0.next = 3;
-                return this.getNickname(guid);
+                return this.getNickname(R.hash(guid));
             case 3:
                 nickname = context$1$0.sent;
                 context$1$0.next = 6;
@@ -107,12 +107,12 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             }
         }, postEvent, this);
     }),
-    getNickname: regeneratorRuntime.mark(function getNickname(guid) {
+    getNickname: regeneratorRuntime.mark(function getNickname(publicId) {
         return regeneratorRuntime.wrap(function getNickname$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
                 context$1$0.next = 2;
-                return this.getStore("/users/" + R.hash(guid));
+                return this.getStore("/users/" + publicId);
             case 2:
                 return context$1$0.abrupt("return", context$1$0.sent);
             case 3:
@@ -152,7 +152,7 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
                 case 0:
                     assert(_.has(params, "message") && _.isString(params.message), "sendMessage(...).params.message: expecting String.");
                     context$1$0.next = 3;
-                    return this.getNickname(params.guid);
+                    return this.getNickname(R.hash(params.guid));
                 case 3:
                     from = context$1$0.sent;
                     context$1$0.next = 6;
@@ -169,9 +169,9 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             return regeneratorRuntime.wrap(function setNickname$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
-                    assert(_.has(params.nickname) && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
+                    assert(_.has(params, "nickname") && _.isString(params.nickname), "setNickname(...).params.nickname: expecting String.");
                     context$1$0.next = 3;
-                    return this.getNickname(params.guid);
+                    return this.getNickname(R.hash(params.guid));
                 case 3:
                     from = context$1$0.sent;
                     context$1$0.next = 6;
@@ -191,9 +191,9 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             return regeneratorRuntime.wrap(function sendEmote$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
-                    assert(_.has(params.emote) && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
+                    assert(_.has(params, "emote") && _.isString(params.emote), "sendEmote(...).params.emote: expecting String.");
                     context$1$0.next = 3;
-                    return this.getNickname(params.guid);
+                    return this.getNickname(R.hash(params.guid));
                 case 3:
                     from = context$1$0.sent;
                     context$1$0.next = 6;
@@ -210,9 +210,9 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             return regeneratorRuntime.wrap(function sendPoke$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
-                    assert(_.has(params.to) && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
+                    assert(_.has(params, "to") && _.isString(params.to), "sendPoke(...).params.poke.to: expecting String.");
                     context$1$0.next = 3;
-                    return this.getNickname(params.guid);
+                    return this.getNickname(R.hash(params.guid));
                 case 3:
                     from = context$1$0.sent;
                     context$1$0.next = 6;
@@ -227,9 +227,20 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
 
                     throw new Error("sendPoke(...): no such target.");
                 case 9:
-                    context$1$0.next = 11;
-                    return this.postEvent("poke", from + " pokes " + to);
-                case 11:
+                    if (!(R.hash(params.guid) === params.to)) {
+                        context$1$0.next = 14;
+                        break;
+                    }
+
+                    context$1$0.next = 12;
+                    return this.postEvent("poke", from + " pokes himself. Hmm.");
+                case 12:
+                    context$1$0.next = 16;
+                    break;
+                case 14:
+                    context$1$0.next = 16;
+                    return this.postEvent("poke", from + " pokes " + to + ".");
+                case 16:
                 case "end":
                     return context$1$0.stop();
                 }
@@ -241,13 +252,13 @@ var ChatUplinkServer = R.SimpleUplinkServer.createServer({
             return regeneratorRuntime.wrap(function setTopic$(context$1$0) {
                 while (1) switch (context$1$0.prev = context$1$0.next) {
                 case 0:
-                    assert(_.has(params.topic) && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
+                    assert(_.has(params, "topic") && _.isString(params.topic), "setTopic(...).params.topic: expecting String.");
                     context$1$0.next = 3;
-                    return this.getNickname(params.guid);
+                    return this.getNickname(R.hash(params.guid));
                 case 3:
                     from = context$1$0.sent;
                     context$1$0.next = 6;
-                    return this.postEvent("topic", from + " set the topic to " + params.topic);
+                    return this.postEvent("topic", from + " set the topic to " + params.topic + ".");
                 case 6:
                     context$1$0.next = 8;
                     return this.setStore("/topic", params.topic);

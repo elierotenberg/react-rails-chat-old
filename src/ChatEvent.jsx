@@ -6,6 +6,14 @@ var assert = require("assert");
 
 var knownEventTypes = ["presence", "message", "emote", "poke", "topic"];
 
+var hideStyle = R.Style.slowlyAutoPrefixStyle({
+    opacity: 0,
+});
+
+var showStyle = R.Style.slowlyAutoPrefixStyle({
+    opacity: 1,
+});
+
 var ChatEvent = React.createClass({
     mixins: [R.Component.Mixin],
     propTypes: {
@@ -43,6 +51,10 @@ var ChatEvent = React.createClass({
                     ".ChatEvent-Contents.ChatEvent-Contents-topic": {
                         color: "red",
                     },
+                    ".ChatEvent-Contents-Wrapper": {
+                        maxWidth: "100%",
+                        wordWrap: "break-word",
+                    },
                 },
             };
         },
@@ -60,16 +72,23 @@ var ChatEvent = React.createClass({
             }(d["get" + key]());
         }).join(":");
     },
+    componentDidMount: function componentDidMount() {
+        this.animate("fade-in", {
+            from: hideStyle,
+            to: showStyle,
+            duration: 500,
+        });
+    },
     render: function render() {
         if(this.state.shouldDisplayTimestamps) {
-            return (<div className="ChatEvent row">
+            return (<div className="ChatEvent row" style={this.isAnimating("fade-in") ? this.getAnimatedStyle("fade-in") : showStyle}>
                 <span className="ChatEvent-Timestamp col-md-1">{this.getTimestamp()}</span>
-                <span className={"ChatEvent-Contents ChatEvent-Contents-" + this.props.event.type + " col-md-10"}>{this.props.event.contents}</span>
+                <span className={"ChatEvent-Contents ChatEvent-Contents-" + this.props.event.type + " col-md-10"}><span className="ChatEvent-Contents-Wrapper">{this.props.event.contents}</span></span>
             </div>);
         }
         else {
             return (<div className="ChatEvent row">
-                <span className={"ChatEvent-Contents ChatEvent-Contents-" + this.props.event.type + " col-md-12"}>{this.props.event.contents}</span>
+                <span className={"ChatEvent-Contents ChatEvent-Contents-" + this.props.event.type + " col-md-12"}><span className="ChatEvent-Contents-Wrapper">{this.props.event.contents}</span></span>
             </div>);
         }
     },

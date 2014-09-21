@@ -5,6 +5,7 @@ var co = require("co");
 var _ = require("lodash");
 
 var commands = [
+    { k: "help",        r: /^\/help$/,          a: "/showHelp"      },
     { k: "nickname",    r: /^\/nick (.*)$/,     a: "/setNickname"   },
     { k: "emote",       r: /^\/em (.*)$/,       a: "/sendEmote"     },
     { k: "emote",       r: /^\/me (.*)$/,       a: "/sendEmote"     },
@@ -68,7 +69,7 @@ var ChatInput = React.createClass({displayName: 'ChatInput',
         return (
             React.DOM.div({className: "ChatInput"}, 
                 React.DOM.form({onSubmit: this._handleSubmit, role: "form"}, 
-                    React.DOM.input({type: "text", className: "form-control ChatInput-Input", placeholder: "Type message or command...", value: this.state.input, onChange: this._handleInputChange}), 
+                    React.DOM.input({type: "text", className: "form-control ChatInput-Input", placeholder: "Type message, command or /help...", value: this.state.input, onChange: this._handleInputChange}), 
                     React.DOM.button({type: "submit", className: "btn btn-primary ChatInput-Button"}, "Send")
                 )
             )

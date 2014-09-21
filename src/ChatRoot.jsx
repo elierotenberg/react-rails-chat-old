@@ -4,6 +4,7 @@ var R = require("react-rails");
 var _ = require("lodash");
 
 var ChatRoom = require("./ChatRoom");
+var ChatHelp = require("./ChatHelp");
 
 var ChatRoot = React.createClass({
     mixins: [R.Root.Mixin],
@@ -26,6 +27,7 @@ var ChatRoot = React.createClass({
     getFluxStoreSubscriptions: function getFluxStoreSubscriptions() {
         return {
             "uplink://topic": "topic",
+            "memory://shouldDisplayHelp": "shouldDisplayHelp",
         };
     },
     render: function render() {
@@ -34,6 +36,7 @@ var ChatRoot = React.createClass({
                 <h1>React on Rails Chat Demo </h1>
                 <p className="lead">Current topic: <em>{this.state.topic}</em></p>
                 <ChatRoom />
+                <ChatHelp toggled={this.state.shouldDisplayHelp} />
             </div>
         );
     },

@@ -13,8 +13,11 @@ var ChatOutput = React.createClass({
                 "chat": {
                     ".ChatOutput": {
                         backgroundColor: "white",
+                        border: "1px solid #cccccc",
                         height: "100%",
                         width: "100%",
+                        overflowY: "scroll",
+                        overflowX: "hidden",
                     },
                 },
             };
@@ -25,6 +28,12 @@ var ChatOutput = React.createClass({
             "uplink://recentEvents": "recentEvents",
         };
     },
+    fluxStoreDidUpdate: function fluxStoreDidUpdate() {
+        this._scrollToBottom();
+    },
+    _scrollToBottom: R.Async.DeferredAnimationFrame(function() {
+        this.getDOMNode().scrollTop = this.getDOMNode().scrollHeight;
+    }),
     render: function render() {
         var recentEvents = this.state.recentEvents || [];
         return (

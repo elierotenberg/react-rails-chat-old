@@ -7,4 +7,5 @@ module.exports = {
     ChatOutput: require("./ChatOutput"),
     ChatInput: require("./ChatInput"),
     ChatEvent: require("./ChatEvent"),
+    ChatHelp: require("./ChatHelp"),
 };

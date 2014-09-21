@@ -2,8 +2,9 @@ var R = require("react-rails");
 var _ = require("lodash");
 var assert = require("assert");
 var url = require("url");
-var ChatDispatcher = require("./ChatDispatcher");
 var Promise = require("bluebird");
+var config = require("./config");
+var ChatDispatcher = require("./ChatDispatcher");
 
 var ChatFlux = R.Flux.createFlux({
     bootstrap: function bootstrap(uplink, guid) {
@@ -13,6 +14,7 @@ var ChatFlux = R.Flux.createFlux({
                 var UplinkStore = R.Store.createUplinkStore(uplink.fetch, uplink.subscribeTo, uplink.unsubscribeFrom);
                 this.registerStore("memory", new MemoryStore());
                 this.getStore("memory").set("/shouldDisplayTimestamps", true);
+                this.getStore("memory").set("/shouldDisplayHelp", false);
                 this.registerStore("uplink", new UplinkStore());
                 this.registerStylesheet("chat", new R.Stylesheet());
             }
@@ -31,7 +33,7 @@ var ChatFlux = R.Flux.createFlux({
         return regeneratorRuntime.wrap(function bootstrapInClient$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                uplink = new R.Uplink("http://localhost:45744/uplink/", "http://localhost:45744/uplink/", guid);
+                uplink = new R.Uplink("http://" + config.hostname + ":" + config.uplinkPort + "/uplink/", "http://" + config.hostname + ":" + config.uplinkPort + "/uplink/", guid);
                 R.Debug.dev(R.scope(function() {
                     this._uplink = uplink;
                 }, this));
@@ -59,7 +61,7 @@ var ChatFlux = R.Flux.createFlux({
         return regeneratorRuntime.wrap(function bootstrapInServer$(context$1$0) {
             while (1) switch (context$1$0.prev = context$1$0.next) {
             case 0:
-                uplink = new R.Uplink("http://localhost:45744/uplink/", null, guid);
+                uplink = new R.Uplink("http://" + config.hostname + ":" + config.uplinkPort + "/uplink/", null, guid);
                 context$1$0.next = 3;
                 return this.bootstrap(uplink);
             case 3:

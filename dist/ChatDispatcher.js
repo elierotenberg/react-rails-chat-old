@@ -23,6 +23,8 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
         "/sendEmote": "_sendEmote",
         "/sendPoke": "_sendPoke",
         "/setTopic": "_setTopic",
+        "/showHelp": "_showHelp",
+        "/hideHelp": "_hideHelp",
     },
     _bindActionListener: function _bindActionListener(method, action) {
         this[method] = R.scope(this[method], this);
@@ -36,6 +38,12 @@ _.extend(ChatDispatcher.prototype, R.Dispatcher.prototype, {
     },
     _setShouldDisplayTimestamps: function _setShouldDisplayTimestamps(val) {
         this._flux.getStore("memory").set("/shouldDisplayTimestamps", val);
+    },
+    _showHelp: function _showHelp() {
+        this._flux.getStore("memory").set("/shouldDisplayHelp", true);
+    },
+    _hideHelp: function _hideHelp() {
+        this._flux.getStore("memory").set("/shouldDisplayHelp", false);
     },
     _sendMessage: regeneratorRuntime.mark(function _sendMessage(params) {
         return regeneratorRuntime.wrap(function _sendMessage$(context$1$0) {

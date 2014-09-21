@@ -435,10 +435,11 @@
 var R = require("react-rails").install(require("react"), require("react/lib/instantiateReactComponent"));
 var express = require("express");
 var cors = require("cors");
-var chatAppParams = require("./chatAppParams");
-var ChatUplinkServer = require("./ChatUplinkServer");
 var path = require("path");
 var co  = require("co");
+var chatAppParams = require("./chatAppParams");
+var ChatUplinkServer = require("./ChatUplinkServer");
+var config = require("./config");
 
 var renderApp = express();
 renderApp.use(cors());
@@ -449,11 +450,11 @@ renderApp.get("/favicon.ico", function(req, res) {
 });
 
 var renderServer = new R.Server(chatAppParams);
-renderApp.use(renderServer.middleware).listen(45743);
+renderApp.use(renderServer.middleware).listen(config.renderPort);
 
 var uplinkApp = express();
 uplinkApp.use(cors());
-console.log("Render server listening...");
+console.log("Render server listening " + config.hostname + ":" + config.renderPort);
 
 var uplinkServer = new ChatUplinkServer();
 co(regeneratorRuntime.mark(function callee$0$0() {
@@ -466,8 +467,8 @@ co(regeneratorRuntime.mark(function callee$0$0() {
             return uplinkServer.installHandlers(uplinkApp, "/uplink/");
         case 2:
             server = context$1$0.sent;
-            server.listen(45744);
-            console.log("Uplink Server listening...");
+            server.listen(config.uplinkPort);
+            console.log("Uplink Server listening on " + config.hostname + ":" + config.uplinkPort);
         case 5:
         case "end":
             return context$1$0.stop();
