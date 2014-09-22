@@ -38,7 +38,7 @@ var ChatUser = React.createClass({
     _handlePoke: function _handlePoke(event) {
         event.preventDefault();
         co(function*() {
-            yield this.getFluxDispatcher("chat").dispatch("/sendPoke", { to: this.props.uniqueId });
+            yield this.dispatch("chat://sendPoke", { to: this.props.uniqueId });
         }).call(this);
     },
     render: function render() {

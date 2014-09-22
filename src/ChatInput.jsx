@@ -5,12 +5,12 @@ var co = require("co");
 var _ = require("lodash");
 
 var commands = [
-    { k: "help",        r: /^\/help$/,          a: "/showHelp"      },
-    { k: "nickname",    r: /^\/nick (.*)$/,     a: "/setNickname"   },
-    { k: "emote",       r: /^\/em (.*)$/,       a: "/sendEmote"     },
-    { k: "emote",       r: /^\/me (.*)$/,       a: "/sendEmote"     },
-    { k: "topic",       r: /^\/topic (.*)$/,    a: "/setTopic"      },
-    { k: "message",     r: /^(.*)$/,            a: "/sendMessage"   },
+    { k: "help",        r: /^\/help$/,          a: "chat://showHelp"      },
+    { k: "nickname",    r: /^\/nick (.*)$/,     a: "chat://setNickname"   },
+    { k: "emote",       r: /^\/em (.*)$/,       a: "chat://sendEmote"     },
+    { k: "emote",       r: /^\/me (.*)$/,       a: "chat://sendEmote"     },
+    { k: "topic",       r: /^\/topic (.*)$/,    a: "chat://setTopic"      },
+    { k: "message",     r: /^(.*)$/,            a: "chat://sendMessage"   },
 ];
 
 var ChatInput = React.createClass({
@@ -59,7 +59,7 @@ var ChatInput = React.createClass({
                 var params = R.record(c.k, res[1]);
                 found = true;
                 co(function*() {
-                    yield this.getFluxDispatcher("chat").dispatch(c.a, params);
+                    yield this.dispatch(c.a, params);
                 }).call(this);
             }
         }, this));
